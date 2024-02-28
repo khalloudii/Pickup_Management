@@ -1,0 +1,29 @@
+﻿@model Pickup_Management.ViewModels.ExternalLoginListViewModel
+@using Microsoft.Owin.Security
+
+@{
+    var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
+    if (loginProviders.Count() > 0)
+    {
+        using (Html.BeginForm("ExternalLogin", "Account", new { ReturnUrl = Model.ReturnUrl }))
+        {
+            @Html.AntiForgeryToken()
+<div>
+    <p>تسجيل الدخول بإستخدام</p>
+    <div class="row">
+        <div class="col-md-12">
+
+            @foreach (AuthenticationDescription p in loginProviders)
+            {
+                <button type="submit" class="btn btn-outline-dark" id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType" title="Log in using your @p.Caption account">@p.AuthenticationType</button>
+            }
+        </div>
+    </div>
+    <p>
+        
+    </p>
+</div>
+        }
+    }
+}
+

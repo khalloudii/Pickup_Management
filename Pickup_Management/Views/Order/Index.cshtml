@@ -1,0 +1,44 @@
+﻿@model List<DataAccess.Entities.Order>
+@{
+    ViewBag.Title = "طلباتي";
+}
+
+<h2>طلبات مسجلة</h2>
+<div class="row">
+    <div class="col-md-12">
+        <div class="table table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>رقم الطلب</th>
+                        <th>تفاصيل</th>
+                        <th>الحالة</th>
+                        <th>رابط الدفع</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var order in Model)
+                    {
+                    <tr>
+                        <td>@order.Id</td>
+                        <td>description</td>
+                        <td>@(order.IsPaid ? "paid" : "initiated")</td>
+                        <td>
+                            <a target="_blank" href="@order.PaymentLink" >رابط دفع</a>
+                        
+                        </td>
+                    </tr>
+                    }
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <a href="/order/add" class="btn btn-primary btn-block mb-4" >إضافة طلب جديد</a>
+    </div>
+</div>

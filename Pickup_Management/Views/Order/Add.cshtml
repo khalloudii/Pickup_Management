@@ -1,0 +1,421 @@
+﻿@model Pickup_Management.ViewModels.OrderViewModel
+@{
+    ViewBag.Title = "تسجيل طلب جديد";
+}
+<style>
+    #map {
+        height: 100%;
+    }
+
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .steps {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .step-button {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: none;
+        background-color: var(--prm-gray);
+        transition: .4s;
+        background: #e9e9e9;
+    }
+
+        .step-button[aria-expanded="true"] {
+            width: 60px;
+            height: 60px;
+            background-color: var(--prm-color);
+            color: #fff;
+            background: gray;
+        }
+
+    .done {
+        background-color: var(--prm-color);
+        color: #fff;
+        background: green;
+    }
+
+    .step-item {
+        z-index: 10;
+        text-align: center;
+    }
+
+    #progress {
+        -webkit-appearance: none;
+        position: absolute;
+        width: 95%;
+        z-index: 5;
+        height: 10px;
+        margin-left: 18px;
+        margin-bottom: 18px;
+    }
+        /* to customize progress bar */
+        #progress::-webkit-progress-value {
+            background-color: var(--prm-color);
+            transition: .5s ease;
+        }
+
+        #progress::-webkit-progress-bar {
+            background-color: var(--prm-gray);
+        }
+</style>
+<h2>
+    تسجيل طلب جديد
+    <span id="loading" style="font-size: 18px; display: none;color: red">يرجى الإنتظار ...</span>
+</h2>
+
+
+@using (Html.BeginForm("Add", "Order", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+
+    <div class="row">
+
+        <div class="accordion" id="accordionExample">
+            <div class="steps">
+                <progress id="progress" value=0 max=100></progress>
+                <div class="step-item">
+                    <button class="step-button text-center" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        1
+                    </button>
+                    <div class="step-title">
+                        حدد العنوان
+                    </div>
+                </div>
+                <div class="step-item">
+                    <button class="step-button text-center collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        2
+                    </button>
+                    <div class="step-title">
+                        أدخل بياناتك
+                    </div>
+                </div>
+                <div class="step-item">
+                    <button class="step-button text-center collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        3
+                    </button>
+                    <div class="step-title">
+                        اختر العناصر
+                    </div>
+                </div>
+                <div class="step-item">
+                    <button class="step-button text-center collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                        4
+                    </button>
+                    <div class="step-title">
+                        تأكيد
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div id="headingOne">
+                </div>
+
+                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                     data-bs-parent="#accordionExample">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 col-xs-12">
+                                <div id="map" style="min-height:250px"></div>
+                            </div>
+                            <div class="col-md-6 col-xs-12">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="flex-grow-1" style="display: flex;">
+                                            <div class="col-sm-6 col-xs-6">
+                                                @Html.TextBoxFor(m => m.Latitude, new { @class = "form-control" })
+                                            </div>
+                                            <div class="col-sm-6 col-xs-6">
+                                                @Html.TextBoxFor(m => m.Longitude, new { @class = "form-control" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" style="padding-top: 30px">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>المدينة</label>
+                                            @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>الحي</label>
+                                            @Html.TextBoxFor(m => m.District, new { @class = "form-control" })
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>العنوان 1</label>
+                                            @Html.TextBoxFor(m => m.Address1, new { @class = "form-control" })
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>العنوان 2</label>
+                                            @Html.TextBoxFor(m => m.Address2, new { @class = "form-control" })
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>الشارع</label>
+                                            @Html.TextBoxFor(m => m.Street, new { @class = "form-control" })
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>الرمز البريدي</label>
+                                            @Html.TextBoxFor(m => m.PostCode, new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div id="headingTwo">
+
+                </div>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>الاسم</label>
+                                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control" })
+                                </div>
+
+                                <div class="form-group">
+                                    <label>رقم الجوال</label>
+                                    @Html.TextBoxFor(m => m.Phone, new { @class = "form-control" })
+                                </div>
+
+                                <div class="form-group">
+                                    <label>البريد الالكتروني</label>
+                                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div id="headingThree">
+
+                </div>
+                <div id="collapseThree" class="collapse" aria-labelledby="headingThree"
+                     data-bs-parent="#accordionExample">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>حدد العنصر</th>
+                                            <th>حدد العدد</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.Items)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <input id="itemCbox_@item.Value" type="checkbox" onchange="updatemark()" value="@item.Value"> @item.Text
+                                                </td>
+                                                <td>
+                                                    <input id="itemTxt_@item.Value" type="text" class="form-control" onchange="updatemark()" />
+                                                </td>
+                                            </tr>
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            @Html.HiddenFor(c => Model.SelectedItemsWithNumbers)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div id="headingFour">
+
+                </div>
+                <div id="collapseFour" class="collapse" aria-labelledby="headingFour"
+                     data-bs-parent="#accordionExample">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <input type="submit" value="حفظ" class="btn btn-primary btn-block mb-4" />
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+
+
+
+}
+
+
+@section Scripts {
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script>
+        (g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })
+            ({ key: "AIzaSyDxcGjq8-fsRfBsQVGigNtsGCPw9Rg5wgo", v: "weekly" });</script>
+
+    <script>
+        async function initMap() {
+            // Request needed libraries.
+            const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+            const map = new Map(document.getElementById("map"), {
+                center: { lat: 24.774265, lng: 46.738586 },
+                zoom: 13,
+                mapId: "4504f8b37365c3d0",
+            });
+
+            const draggableMarker = new AdvancedMarkerElement({
+                map,
+                position: { lat: 24.774265, lng: 46.738586 },
+                gmpDraggable: true,
+                title: "This marker is draggable.",
+            });
+
+            draggableMarker.addListener("dragend", (event) => {
+                const position = draggableMarker.position;
+                console.log(position);
+
+                $('#Latitude').val(position.lat);
+                $('#Longitude').val(position.lng);
+
+                clearFields();
+                getDetails(position.lat, position.lng);
+            });
+        }
+
+        initMap();
+
+        function clearFields() {
+            $('#City').val('');
+            $('#District').val('');
+            $('#Address1').val('');
+            $('#Address2').val('');
+            $('#Street').val('');
+            $('#PostCode').val('');
+        }
+
+        function getDetails(lat, lng) {
+            $('#loading').show();
+            var params = {
+                // Request parameters
+                "lat": lat,
+                "long": lng,
+                "language": "A",
+                "format": "json",
+            };
+
+            $.ajax({
+                url: "https://apina.address.gov.sa/NationalAddress/v3.1/Address/address-geocode?" + $.param(params),
+                beforeSend: function (xhrObj) {
+                    // Request headers
+                    xhrObj.setRequestHeader("api_key", "f99d22341d4b453ab30f7d07f4d1f7e3");
+                },
+                type: "GET",
+                // Request body
+                data: "{body}",
+            })
+                .done(function (data) {
+                    console.log(data);
+
+                    if (data.Addresses != null) {
+                        console.log(data.Addresses["0"]);
+
+                        var address = data.Addresses["0"];
+                        $('#City').val(address.City);
+                        $('#District').val(address.District);
+                        $('#Address1').val(address.Address1);
+                        $('#Address2').val(address.Address2);
+                        $('#Street').val(address.Street);
+                        $('#PostCode').val(address.PostCode);
+                    } else {
+                        alert("يرجى تحديد الموقع بشكل صحيح");
+                    }
+                    $('#loading').hide();
+                })
+                .fail(function (error) {
+                    console.log(error.statusText);
+                    if (error.status == 429) {
+                        alert("Number of request is limited! please wait for seconds.");
+                    }
+                    $('#loading').hide();
+                });
+        }
+    </script>
+
+    <!--    Bootstrap 5 JavaScript Bundle with Popper-- >
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+    <!-- Stepper JavaScript -->
+
+    <script>
+        const stepButtons = document.querySelectorAll('.step-button');
+        const progress = document.querySelector('#progress');
+
+        Array.from(stepButtons).forEach((button, index) => {
+            button.addEventListener('click', () => {
+                progress.setAttribute('value', index * 100 / (stepButtons.length - 1));//there are 3 buttons. 2 spaces.
+
+                stepButtons.forEach((item, secindex) => {
+                    if (index > secindex) {
+                        item.classList.add('done');
+                    }
+                    if (index < secindex) {
+                        item.classList.remove('done');
+                    }
+                })
+            })
+        })
+    </script>
+
+    <script>
+        function updatemark() {
+
+
+            var selectedItems = "";
+            var itemId = "";
+            var itemNumber = "";
+
+            $("[id^='itemCbox_']").each(function (i, e) {
+                if ($(this).is(':checked')) {
+                    itemId = $(this).val();
+                    itemNumber = $('#itemTxt_' + itemId).val();
+                    selectedItems = selectedItems + itemId + "_" + itemNumber + ","
+                }
+            });
+            $('#SelectedItemsWithNumbers').val(selectedItems);
+        }
+    </script>
+}

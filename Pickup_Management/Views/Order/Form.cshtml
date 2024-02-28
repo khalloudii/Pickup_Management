@@ -1,0 +1,122 @@
+﻿@model Pickup_Management.ViewModels.OrderViewModel
+@{
+    ViewBag.Title = "تسجيل طلب جديد";
+}
+<style>
+    #map {
+        height: 100%;
+    }
+
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+</style>
+<h2>تسجيل طلب جديد</h2>
+
+@using (Html.BeginForm("form", "Order", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="row" style="height: 300px">
+        <div class="col-md-6 col-xs-12">
+            <div id="map"></div>
+        </div>
+        <div class="col-md-6 col-xs-12">
+            @Html.TextBoxFor(m => m.Latitude, new { @class = "form-control" })
+            @Html.TextBoxFor(m => m.Longitude, new { @class = "form-control" })
+        </div>
+    </div>
+
+
+
+    <input type="submit" value="حفظ" class="btn btn-primary btn-block mb-4" />
+}
+
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            var params = {
+                // Request parameters
+                "lat": "24.774265",
+                "long": "46.738586",
+                "language": "A",
+                "format": "json",
+            };
+
+            $.ajax({
+                url: "https://apina.address.gov.sa/NationalAddress/v3.1/Address/address-geocode?" + $.param(params),
+                beforeSend: function (xhrObj) {
+                    // Request headers
+                    xhrObj.setRequestHeader("api_key", "f99d22341d4b453ab30f7d07f4d1f7e3");
+                },
+                type: "GET",
+                // Request body
+                data: "{body}",
+            })
+                .done(function (data) {
+                    alert("success");
+                })
+                .fail(function () {
+                    alert("error");
+                });
+        });
+    </script>
+    @*<script type="text/javascript">
+            $(function () {
+                var params = {
+                    // Request parameters
+                };
+
+                $.ajax({
+                    url: "https://apina.address.gov.sa/NationalAddress/v3.1/maps/map-engine?" + $.param(params),
+                    beforeSend: function (xhrObj) {
+                        // Request headers
+                        xhrObj.setRequestHeader("api_key", "f99d22341d4b453ab30f7d07f4d1f7e3");
+                    },
+                    type: "GET",
+                    // Request body
+                    data: "{body}",
+                })
+                    .done(function (data) {
+                        alert("success");
+                    })
+                    .fail(function () {
+                        alert("error");
+                    });
+            });
+        </script>*@
+
+    @*<script type="text/javascript">
+            $(function() {
+                var params = {
+                    // Request parameters
+                    "format": "json",
+                    "page": "1",
+                    "encode": "utf8",
+                    "shortaddress": "RRRD2929",
+                };
+
+                $.ajax({
+                    url: "https://apina.address.gov.sa/NationalAddress/NationalAddressByShortAddress/NationalAddressByShortAddress?" + $.param(params),
+                    beforeSend: function(xhrObj){
+                        // Request headers
+                        xhrObj.setRequestHeader("api_key","f99d22341d4b453ab30f7d07f4d1f7e3");
+                    },
+                    type: "GET",
+                    // Request body
+                    data: "",
+                })
+                .done(function(data) {
+                    console.log(data);
+                })
+                .fail(function() {
+                    alert("error");
+                });
+            });
+        </script>*@
+}
